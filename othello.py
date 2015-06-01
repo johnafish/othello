@@ -144,10 +144,10 @@ class Board:
 					boards.append(test)
 					choices.append([x,y])
 
-		bestScore = -32
+		bestScore = -float("inf")
 		bestIndex = 0
 		for i in range(len(boards)):
-			score= dumbScore(boards[i])
+			score= dumbScore(boards[i],self.player)
 			if score>bestScore:
 				bestIndex=i
 				bestScore = score
@@ -163,14 +163,17 @@ class Board:
 					boards.append(test)
 					choices.append([x,y])
 
-		bestScore = -32
+		bestScore = -float("inf")
 		bestIndex = 0
 		for i in range(len(boards)):
-			score= slightlyLessDumbScore(boards[i])
+			score= slightlyLessDumbScore(boards[i],self.player)
 			if score>bestScore:
 				bestIndex=i
 				bestScore = score
 		self.boardMove(choices[bestIndex][0],choices[bestIndex][1])
+
+	def goodMove(self):
+		pass
 
 
 def move(passedArray,x,y):
@@ -246,10 +249,14 @@ def drawGridBackground(outline=False):
 
 
 #Simple heuristic. Compares number of each tile.
-def dumbScore(array):
+def dumbScore(array,player):
 	score = 0
-	colour="b"
-	opponent="w"
+	if player==1:
+		colour="b"
+		opponent="w"
+	else:
+		colour = "w"
+		opponent = "b"
 	for x in range(8):
 		for y in range(8):
 			if array[x][y]==colour:
@@ -258,10 +265,14 @@ def dumbScore(array):
 				score-=1
 	return score
 
-def slightlyLessDumbScore(array):
+def slightlyLessDumbScore(array,player):
 	score = 0
-	colour="b"
-	opponent="w"
+	if player==1:
+		colour="b"
+		opponent="w"
+	else:
+		colour = "w"
+		opponent = "b"
 	for x in range(8):
 		for y in range(8):
 			add = 1
