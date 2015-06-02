@@ -65,7 +65,7 @@ class Board:
 
 		#If the computer is AI, make a move
 		if self.player==1:
-			sleep(0.3)
+			sleep(1.5)
 			self.slightlyLessDumbMove()
 
 	#METHOD: Draws scoreboard to screen
