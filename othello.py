@@ -65,8 +65,9 @@ class Board:
 
 		#If the computer is AI, make a move
 		if self.player==1:
-			sleep(1.5)
-			self.slightlyLessDumbMove()
+			self.array = self.minimax(self.array,3,1)[1]
+			self.player = 1-self.player
+			self.update()
 
 	#METHOD: Draws scoreboard to screen
 	def drawScoreBoard(self):
@@ -212,9 +213,42 @@ class Board:
 		#Move to the best location based on slightlyLessDumbScore()
 		self.boardMove(choices[bestIndex][0],choices[bestIndex][1])
 
+
 	#This will contain minimax... later.
-	def goodMove(self):
-		pass
+	def minimax(self, node, depth, maximizing):
+		boards = []
+		choices = []
+
+		for x in range(8):
+			for y in range(8):
+				if self.valid(x,y):
+					test = move(node,x,y)
+					boards.append(test)
+					choices.append([x,y])
+
+		if depth==0 or len(choices)==0:
+			return ([decentHeuristic(node,maximizing),node])
+
+		if maximizing:
+			bestValue = -float("inf")
+			bestBoard = []
+			for board in boards:
+				val = self.minimax(board,depth-1,0)[0]
+				if val>bestValue:
+					bestValue = val
+					bestBoard = board
+			return ([bestValue,bestBoard])
+
+		else:
+			bestValue = float("inf")
+			bestBoard = []
+			for board in boards:
+				val = self.minimax(board,depth-1,1)[0]
+				if val<bestValue:
+					bestValue = val
+					bestBoard = board
+			return ([bestValue,bestBoard])
+
 
 #FUNCTION: Returns a board after making a move according to Othello rules
 #Assumes the move is valid
@@ -346,6 +380,35 @@ def slightlyLessDumbScore(array,player):
 				score-=add
 	return score
 
+def decentHeuristic(array,player):
+	score = 0
+	#Set player and opponent colours
+	if player==1:
+		colour="b"
+		opponent="w"
+	else:
+		colour = "w"
+		opponent = "b"
+	#Go through all the tiles	
+	for x in range(8):
+		for y in range(8):
+			#Normal tiles worth 1
+			add = 1
+			#Adjacent to corners are worth -3
+			if (x==0 and (y==1 or y==6)) or (x==7 and (y==1 or y==6)) or (x==1 and (0<=y<=1 or 6<=y<=7)) or (x==7 and (0<=y<=1 or 6<=y<=7)):
+				add=-3
+			#Edge tiles worth 3
+			elif (x==0 and 1<y<6) or (x==7 and 1<y<6) or (y==0 and 1<x<6) or (y==7 and 1<x<6):
+				add=3
+			#Corner tiles worth 15
+			elif (x==0 and y==0) or (x==0 and y==7) or (x==7 and y==0) or (x==7 and y==7):
+				add = 15
+			#Add or subtract the value of the tile corresponding to the colour
+			if array[x][y]==colour:
+				score+=add
+			elif array[x][y]==opponent:
+				score-=add
+	return score
 #When mouse moves, we want a green highlight to appear for valid moves, red for invalid
 def mouseMovementHandle(event):
 	#Is it the player's turn?
