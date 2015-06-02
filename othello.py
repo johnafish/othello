@@ -390,8 +390,10 @@ drawGridBackground()
 board = Board()
 board.update()
 
-#Binding, setting, and looping
+#Binding, setting
 screen.bind("<Motion>", mouseMovementHandle)
 screen.bind("<Button-1>", clickHandle)
 screen.focus_set()
+
+#Run forever
 root.mainloop()
