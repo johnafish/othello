@@ -24,7 +24,8 @@ class Board:
 	def __init__(self):
 		#White goes first (0 is white and player,1 is black and computer)
 		self.player = 0
-		
+		self.passed = False
+		self.won = False
 		#Initializing an empty board
 		self.array = []
 		for x in range(8):
@@ -40,16 +41,31 @@ class Board:
 
 	#Updating the board to the screen
 	def update(self):
-		for x in range(8):
-			for y in range(8):
-				#Could replace the circles with images later, if I want
-				if self.array[x][y]=="w":
-					screen.create_oval(52+50*x,52+50*y,48+50*(x+1),48+50*(y+1),fill="white",outline="white")
-				if self.array[x][y]=="b":
-					screen.create_oval(52+50*x,52+50*y,48+50*(x+1),48+50*(y+1),fill="black",outline="black")
-		#Draw the scoreboard and update the screen
-		self.drawScoreBoard()
-		screen.update()
+		if not self.won:
+			for x in range(8):
+				for y in range(8):
+					#Could replace the circles with images later, if I want
+					if self.array[x][y]=="w":
+						screen.create_oval(52+50*x,52+50*y,48+50*(x+1),48+50*(y+1),fill="white",outline="white")
+					if self.array[x][y]=="b":
+						screen.create_oval(52+50*x,52+50*y,48+50*(x+1),48+50*(y+1),fill="black",outline="black")
+			#Draw the scoreboard and update the screen
+			self.drawScoreBoard()
+			screen.update()
+			#If the computer is AI, make a move
+			if self.player==1:
+				startTime = time()
+				self.array = self.alphaBeta(self.array,4,-float("inf"),float("inf"),1)[1]
+				self.player = 1-self.player
+				deltaTime = round((time()-startTime)*100)/100
+				# print(nodes,"nodes expanded.")
+				# print("Took {0}s.".format(deltaTime))
+				nodes = 0
+				self.update()
+				#Player must pass?
+				self.passTest()
+		else:
+			screen.create_text(250,550,anchor="c",font=("Consolas",15), text="The game is done!")
 
 	#Moves to position
 	def boardMove(self,x,y):
@@ -66,18 +82,7 @@ class Board:
 		self.passTest()
 		self.update()
 
-		#If the computer is AI, make a move
-		if self.player==1:
-			startTime = time()
-			self.array = self.alphaBeta(self.array,4,-float("inf"),float("inf"),1)[1]
-			self.player = 1-self.player
-			deltaTime = round((time()-startTime)*100)/100
-			# print(nodes,"nodes expanded.")
-			# print("Took {0}s.".format(deltaTime))
-			nodes = 0
-			self.update()
-			#Player must pass?
-			self.passTest()
+		
 			
 
 	#METHOD: Draws scoreboard to screen
@@ -174,6 +179,13 @@ class Board:
 					mustPass=False
 		if mustPass:
 			self.player = 1-self.player
+			if self.passed==True:
+				self.won = True
+			else:
+				self.passed = True
+			self.update()
+		else:
+			self.passed = False
 
 	#METHOD: Stupid AI - Chooses a random move
 	def dumbMove(self):
@@ -515,26 +527,41 @@ def mouseMovementHandle(event):
 
 #When the user clicks, if it's a valid move, make the move
 def clickHandle(event):
+	xMouse = event.x
+	yMouse = event.y
+	x = int((event.x-50)/50)
+	y = int((event.y-50)/50)
+	print(x,y)
 	#Is it the player's turn?
 	if board.player==0:
 		#Delete the highlights
 		screen.delete("highlight")
 		#Determine the grid index for where the mouse was clicked
-		xMouse = event.x
-		yMouse = event.y
-		x = int((event.x-50)/50)
-		y = int((event.y-50)/50)
+		
 		#If the click is inside the bounds and the move is valid, move to that location
 		if 0<=x<=7 and 0<=y<=7:
 			if board.valid(x,y):
 				board.boardMove(x,y)
+def create_buttons():
+		screen.create_rectangle(0,5,50,55,fill="#000033", outline="#000033")
+		screen.create_rectangle(0,0,50,50,fill="#000088", outline="#000088")
 
-#Draw the background
-drawGridBackground()
+		screen.create_rectangle(450,5,500,55,fill="#330000", outline="#330000")
+		screen.create_rectangle(450,0,500,50,fill="#880000", outline="#880000")
+def runGame():
+	global board
+	screen.delete(ALL)
+	create_buttons()
+	board = 0
 
-#Create the board and update it
-board = Board()
-board.update()
+	#Draw the background
+	drawGridBackground()
+
+	#Create the board and update it
+	board = Board()
+	board.update()
+
+runGame()
 
 #Binding, setting
 screen.bind("<Motion>", mouseMovementHandle)
