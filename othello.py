@@ -422,7 +422,7 @@ def decentHeuristic(array,player):
 			elif array[x][y]==opponent:
 				score-=add
 	return score
-#When mouse moves, we want a green highlight to appear for valid moves, red for invalid
+#When mouse moves, we want a green highlight to appear for valid moves
 def mouseMovementHandle(event):
 	#Is it the player's turn?
 	if board.player==0:
@@ -439,9 +439,6 @@ def mouseMovementHandle(event):
 			if board.valid(x,y):
 				#Create a green highlight if it's a valid move
 				screen.create_oval(52+50*x,52+50*y,48+50*(x+1),48+50*(y+1),tags="highlight",fill="green",outline="green")
-			else:
-				#Create a red highlight if it's a valid move
-				screen.create_oval(52+50*x,52+50*y,48+50*(x+1),48+50*(y+1),tags="highlight",fill="red",outline="red")
 
 #When the user clicks, if it's a valid move, make the move
 def clickHandle(event):
