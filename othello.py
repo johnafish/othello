@@ -67,7 +67,7 @@ class Board:
 
 		#If the computer is AI, make a move
 		if self.player==1:
-			self.array = self.minimax(self.array,3,1)[1]
+			self.array = self.alphaBeta(self.array,5,-float("inf"),float("inf"),1)[1]
 			self.player = 1-self.player
 			self.update()
 			
@@ -262,7 +262,44 @@ class Board:
 					bestBoard = board
 			return ([bestValue,bestBoard])
 
+	def alphaBeta(self,node,depth,alpha,beta,maximizing):
+		boards = []
+		choices = []
 
+		for x in range(8):
+			for y in range(8):
+				if self.valid(x,y):
+					test = move(node,x,y)
+					boards.append(test)
+					choices.append([x,y])
+
+		if depth==0 or len(choices)==0:
+			return ([slightlyLessDumbScore(node,1-maximizing),node])
+
+		if maximizing:
+			v = -float("inf")
+			bestBoard = []
+			for board in boards:
+				boardValue = self.alphaBeta(board,depth-1,alpha,beta,0)[0]
+				if boardValue>v:
+					v = boardValue
+					bestBoard = board
+				alpha = max(alpha,v)
+				if beta <= alpha:
+					break
+			return([v,bestBoard])
+		else:
+			v = float("inf")
+			bestBoard = []
+			for board in boards:
+				boardValue = self.alphaBeta(board,depth-1,alpha,beta,1)[0]
+				if boardValue<v:
+					v = boardValue
+					bestBoard = board
+				beta = min(beta,v)
+				if beta<=alpha:
+					break
+			return([v,bestBoard])
 #FUNCTION: Returns a board after making a move according to Othello rules
 #Assumes the move is valid
 def move(passedArray,x,y):
