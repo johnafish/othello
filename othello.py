@@ -14,7 +14,7 @@ from math import *
 from time import *
 from random import *
 from copy import deepcopy
-
+nodes = 0
 #Tkinter setup
 root = Tk()
 screen = Canvas(root, width=500, height=600, background="#444",highlightthickness=0)
@@ -53,6 +53,7 @@ class Board:
 
 	#Moves to position
 	def boardMove(self,x,y):
+		global nodes
 		#Move and update screen
 		self.array = move(self.array,x,y)
 		
@@ -61,15 +62,22 @@ class Board:
 		self.player = 1-self.player
 		self.update()
 		
-		#Check if player must pass
+		#Check if ai must pass
 		self.passTest()
 		self.update()
 
 		#If the computer is AI, make a move
 		if self.player==1:
-			self.array = self.alphaBeta(self.array,5,-float("inf"),float("inf"),1)[1]
+			startTime = time()
+			self.array = self.alphaBeta(self.array,4,-float("inf"),float("inf"),1)[1]
 			self.player = 1-self.player
+			deltaTime = round((time()-startTime)*100)/100
+			# print(nodes,"nodes expanded.")
+			# print("Took {0}s.".format(deltaTime))
+			nodes = 0
 			self.update()
+			#Player must pass?
+			self.passTest()
 			
 
 	#METHOD: Draws scoreboard to screen
@@ -229,6 +237,8 @@ class Board:
 
 	#This will contain minimax... later.
 	def minimax(self, node, depth, maximizing):
+		global nodes
+		nodes += 1
 		boards = []
 		choices = []
 
@@ -263,6 +273,8 @@ class Board:
 			return ([bestValue,bestBoard])
 
 	def alphaBeta(self,node,depth,alpha,beta,maximizing):
+		global nodes
+		nodes += 1
 		boards = []
 		choices = []
 
@@ -274,7 +286,7 @@ class Board:
 					choices.append([x,y])
 
 		if depth==0 or len(choices)==0:
-			return ([slightlyLessDumbScore(node,1-maximizing),node])
+			return ([decentHeuristic(node,maximizing),node])
 
 		if maximizing:
 			v = -float("inf")
@@ -444,15 +456,39 @@ def decentHeuristic(array,player):
 		for y in range(8):
 			#Normal tiles worth 1
 			add = 1
+			cornerVal = 15
 			#Adjacent to corners are worth -3
-			if (x==0 and (y==1 or y==6)) or (x==7 and (y==1 or y==6)) or (x==1 and (0<=y<=1 or 6<=y<=7)) or (x==7 and (0<=y<=1 or 6<=y<=7)):
-				add=-3
+
+			if (x==0 and y==1) or (x==1 and 0<=y<=1):
+				if array[0][0]==colour:
+					add = 3
+				else:
+					add = -cornerVal
+
+
+			elif (x==0 and y==6) or (x==1 and 6<=y<=7):
+				if array[7][0]==colour:
+					add = 3
+				else:
+					add = -cornerVal
+
+			elif (x==7 and y==1) or (x==6 and 0<=y<=1):
+				if array[0][7]==colour:
+					add = 3
+				else:
+					add = -cornerVal
+
+			elif (x==7 and y==6) or (x==6 and 6<=y<=7):
+				if array[7][7]==colour:
+					add = 3
+				else:
+					add = -cornerVal
 			#Edge tiles worth 3
 			elif (x==0 and 1<y<6) or (x==7 and 1<y<6) or (y==0 and 1<x<6) or (y==7 and 1<x<6):
 				add=3
 			#Corner tiles worth 15
 			elif (x==0 and y==0) or (x==0 and y==7) or (x==7 and y==0) or (x==7 and y==7):
-				add = 15
+				add = cornerVal
 			#Add or subtract the value of the tile corresponding to the colour
 			if array[x][y]==colour:
 				score+=add
