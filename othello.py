@@ -55,19 +55,22 @@ class Board:
 	def boardMove(self,x,y):
 		#Move and update screen
 		self.array = move(self.array,x,y)
-		self.update()
+		
 		
 		#Switch Player
 		self.player = 1-self.player
+		self.update()
 		
 		#Check if player must pass
 		self.passTest()
+		self.update()
 
 		#If the computer is AI, make a move
 		if self.player==1:
 			self.array = self.minimax(self.array,3,1)[1]
 			self.player = 1-self.player
 			self.update()
+			
 
 	#METHOD: Draws scoreboard to screen
 	def drawScoreBoard(self):
@@ -84,9 +87,19 @@ class Board:
 				elif self.array[x][y]=="b":
 					computer_score+=1
 
+		if self.player==0:
+			player_colour = "green"
+			computer_colour = "gray"
+		else:
+			player_colour = "gray"
+			computer_colour = "green"
+
+		screen.create_oval(5,540,25,560,fill=player_colour,outline=player_colour)
+		screen.create_oval(380,540,400,560,fill=computer_colour,outline=computer_colour)
+
 		#Pushing text to screen
-		screen.create_text(0,550,anchor="w", tags="score",font=("Consolas", 50),fill="white",text=player_score)
-		screen.create_text(500,550,anchor="e", tags="score",font=("Consolas", 50),fill="black",text=computer_score)
+		screen.create_text(30,550,anchor="w", tags="score",font=("Consolas", 50),fill="white",text=player_score)
+		screen.create_text(400,550,anchor="w", tags="score",font=("Consolas", 50),fill="black",text=computer_score)
 
 	#FUNCTION: Checks if a move is valid: returns True or False
 	def valid(self,x,y):
@@ -227,7 +240,7 @@ class Board:
 					choices.append([x,y])
 
 		if depth==0 or len(choices)==0:
-			return ([decentHeuristic(node,maximizing),node])
+			return ([decentHeuristic(node,1-maximizing),node])
 
 		if maximizing:
 			bestValue = -float("inf")
