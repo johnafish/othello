@@ -58,8 +58,8 @@ class Board:
 				self.array = self.alphaBeta(self.array,4,-float("inf"),float("inf"),1)[1]
 				self.player = 1-self.player
 				deltaTime = round((time()-startTime)*100)/100
-				# print(nodes,"nodes expanded.")
-				# print("Took {0}s.".format(deltaTime))
+				if deltaTime<2:
+					sleep(2-deltaTime)
 				nodes = 0
 				self.update()
 				#Player must pass?
@@ -81,8 +81,6 @@ class Board:
 		#Check if ai must pass
 		self.passTest()
 		self.update()
-
-		
 			
 
 	#METHOD: Draws scoreboard to screen
@@ -529,25 +527,34 @@ def mouseMovementHandle(event):
 def clickHandle(event):
 	xMouse = event.x
 	yMouse = event.y
-	x = int((event.x-50)/50)
-	y = int((event.y-50)/50)
-	print(x,y)
-	#Is it the player's turn?
-	if board.player==0:
-		#Delete the highlights
-		screen.delete("highlight")
-		#Determine the grid index for where the mouse was clicked
-		
-		#If the click is inside the bounds and the move is valid, move to that location
-		if 0<=x<=7 and 0<=y<=7:
-			if board.valid(x,y):
-				board.boardMove(x,y)
+	if xMouse>=450 and yMouse<=50:
+		root.destroy()
+	elif xMouse<=50 and yMouse<=50:
+		runGame()
+	else:
+		#Is it the player's turn?
+		if board.player==0:
+			#Delete the highlights
+			x = int((event.x-50)/50)
+			y = int((event.y-50)/50)
+			screen.delete("highlight")
+			#Determine the grid index for where the mouse was clicked
+			
+			#If the click is inside the bounds and the move is valid, move to that location
+			if 0<=x<=7 and 0<=y<=7:
+				if board.valid(x,y):
+					board.boardMove(x,y)
 def create_buttons():
 		screen.create_rectangle(0,5,50,55,fill="#000033", outline="#000033")
 		screen.create_rectangle(0,0,50,50,fill="#000088", outline="#000088")
+		screen.create_arc(5,5,45,45,fill="#000088", width="2",style="arc",outline="white",extent=300)
+		screen.create_polygon(33,38,36,45,40,39,fill="white",outline="white")
 
 		screen.create_rectangle(450,5,500,55,fill="#330000", outline="#330000")
 		screen.create_rectangle(450,0,500,50,fill="#880000", outline="#880000")
+
+		screen.create_line(455,5,495,45,fill="white",width="3")
+		screen.create_line(495,5,455,45,fill="white",width="3")
 def runGame():
 	global board
 	screen.delete(ALL)
