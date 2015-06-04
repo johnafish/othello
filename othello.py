@@ -45,20 +45,21 @@ class Board:
 	def update(self):
 		screen.delete("highlight")
 		screen.delete("tile")
-		if not self.won:
-			for x in range(8):
-				for y in range(8):
-					#Could replace the circles with images later, if I want
-					if self.array[x][y]=="w":
-						screen.create_oval(54+50*x,55+50*y,46+50*(x+1),47+50*(y+1),tags="tile",fill="#aaa",outline="#aaa")
-						screen.create_oval(54+50*x,52+50*y,46+50*(x+1),44+50*(y+1),tags="tile",fill="#fff",outline="#fff")
+		
+		for x in range(8):
+			for y in range(8):
+				#Could replace the circles with images later, if I want
+				if self.array[x][y]=="w":
+					screen.create_oval(54+50*x,55+50*y,46+50*(x+1),47+50*(y+1),tags="tile",fill="#aaa",outline="#aaa")
+					screen.create_oval(54+50*x,52+50*y,46+50*(x+1),44+50*(y+1),tags="tile",fill="#fff",outline="#fff")
 
-					elif self.array[x][y]=="b":
-						screen.create_oval(54+50*x,55+50*y,46+50*(x+1),47+50*(y+1),tags="tile",fill="#000",outline="#000")
-						screen.create_oval(54+50*x,52+50*y,46+50*(x+1),44+50*(y+1),tags="tile",fill="#111",outline="#111")
-					if self.player == 0:
-						if self.valid(x,y):
-							screen.create_oval(68+50*x,68+50*y,32+50*(x+1),32+50*(y+1),tags="highlight",fill="#008000",outline="#008000")
+				elif self.array[x][y]=="b":
+					screen.create_oval(54+50*x,55+50*y,46+50*(x+1),47+50*(y+1),tags="tile",fill="#000",outline="#000")
+					screen.create_oval(54+50*x,52+50*y,46+50*(x+1),44+50*(y+1),tags="tile",fill="#111",outline="#111")
+				if self.player == 0:
+					if self.valid(x,y):
+						screen.create_oval(68+50*x,68+50*y,32+50*(x+1),32+50*(y+1),tags="highlight",fill="#008000",outline="#008000")
+		if not self.won:
 			#Draw the scoreboard and update the screen
 			self.drawScoreBoard()
 			screen.update()
@@ -648,4 +649,5 @@ screen.bind("<Button-1>", clickHandle)
 screen.focus_set()
 
 #Run forever
+root.wm_title("Othello")
 root.mainloop()
