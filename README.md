@@ -14,12 +14,15 @@ To play Othello, run the file _othello.py_ in IDLE for Python 3.x, and press F5 
 
 You will be presented with an 8x8 grid on the screen with a 2x2 square of alternating tiles in the middle as described above. There will be a scoreboard in the bottom section of the screen to keep track of your score (how many tiles of your colour) and to indicate whose turn it is.
 
-When it is your turn, you may move your mouse over the board and the tile under it will turn either red or green, depending on the validity of your move. If you are positioned for a valid move, clicking will place a tile and flip the tiles required.
+When it is your turn, you'll see green dots showing all of your valid moves. Clicking one of these dots will make a move and it will now be the computer's turn.
 
-If you wish to restart or create a new game, you may press the “Restart” button in the bottom section of the screen. To quit, you may press the “Quit” button beside the “Restart” button.
+If you wish to restart or create a new game, you may press the "Restart" button in the top left of the screen. To quit, you may press the "Quit" button in the top right of the screen.
 
 ###TO DO:
+- Good win/loss indicator
+- Animation for changing tiles
+
+###DONE:
 - Better AI (minimax with alpha beta pruning is end-goal)
 - Player turn indicator
-- Win/loss indicator
 - Restart/Quit GUI

@@ -16,6 +16,7 @@ from random import *
 from copy import deepcopy
 nodes = 0
 depth = 4
+moves = 0
 #Tkinter setup
 root = Tk()
 screen = Canvas(root, width=500, height=600, background="#444",highlightthickness=0)
@@ -94,6 +95,7 @@ class Board:
 
 	#METHOD: Draws scoreboard to screen
 	def drawScoreBoard(self):
+		global moves
 		#Deleting prior score elements
 		screen.delete("score")
 
@@ -120,6 +122,8 @@ class Board:
 		#Pushing text to screen
 		screen.create_text(30,550,anchor="w", tags="score",font=("Consolas", 50),fill="white",text=player_score)
 		screen.create_text(400,550,anchor="w", tags="score",font=("Consolas", 50),fill="black",text=computer_score)
+
+		moves = player_score+computer_score
 
 	#FUNCTION: Checks if a move is valid: returns True or False
 	def valid(self,x,y):
@@ -305,7 +309,7 @@ class Board:
 					choices.append([x,y])
 
 		if depth==0 or len(choices)==0:
-			return ([decentHeuristic(node,maximizing),node])
+			return ([finalHeuristic(node,maximizing),node])
 
 		if maximizing:
 			v = -float("inf")
@@ -463,9 +467,9 @@ def slightlyLessDumbScore(array,player):
 
 def decentHeuristic(array,player):
 	score = 0
-	cornerVal = 15
-	adjacentVal = 10
-	sideVal = 3
+	cornerVal = 25
+	adjacentVal = 15
+	sideVal = 5
 	#Set player and opponent colours
 	if player==1:
 		colour="b"
@@ -517,6 +521,79 @@ def decentHeuristic(array,player):
 			elif array[x][y]==opponent:
 				score-=add
 	return score
+
+#The plan is this:
+#Early game (first 16 moves): Maximize moves
+#Midgame (17-32 move): Value Corners and edges (decentHeuristic)
+#Endgame: Make the move that is the most valuable for owning any pieces (dumbScore)
+def finalHeuristic(array,player):
+	if moves<=16:
+		numMoves = 0
+		for x in range(8):
+			for y in range(8):
+				if valid(array,player,x,y):
+					numMoves += 1
+		return numMoves
+	elif moves<=48:
+		return decentHeuristic(array,player)
+	elif moves<=56:
+		return slightlyLessDumbScore(array,player)
+	else:
+		return dumbScore(array,player)
+def valid(array,player,x,y):
+	#Sets player colour
+	if player==0:
+		colour="w"
+	else:
+		colour="b"
+		
+	#If there's already a piece there, it's an invalid move
+	if array[x][y]!=None:
+		return False
+
+	else:
+		#Generating the list of neighbours
+		neighbour = False
+		neighbours = []
+		for i in range(max(0,x-1),min(x+2,8)):
+			for j in range(max(0,y-1),min(y+2,8)):
+				if array[i][j]!=None:
+					neighbour=True
+					neighbours.append([i,j])
+		#If there's no neighbours, it's an invalid move
+		if not neighbour:
+			return False
+		else:
+			#Iterating through neighbours to determine if at least one line is formed
+			valid = False
+			for neighbour in neighbours:
+
+				neighX = neighbour[0]
+				neighY = neighbour[1]
+				
+				#If the neighbour colour is equal to your colour, it doesn't form a line
+				#Go onto the next neighbour
+				if array[neighX][neighY]==colour:
+					continue
+				else:
+					#Determine the direction of the line
+					deltaX = neighX-x
+					deltaY = neighY-y
+					tempX = neighX
+					tempY = neighY
+
+					while 0<=tempX<=7 and 0<=tempY<=7:
+						#If an empty space, no line is formed
+						if array[tempX][tempY]==None:
+							break
+						#If it reaches a piece of the player's colour, it forms a line
+						if array[tempX][tempY]==colour:
+							valid=True
+							break
+						#Move the index according to the direction of the line
+						tempX+=deltaX
+						tempY+=deltaY
+			return valid
 
 #When the user clicks, if it's a valid move, make the move
 def clickHandle(event):
