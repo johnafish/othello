@@ -55,7 +55,7 @@ class Board:
 					elif self.array[x][y]=="b":
 						screen.create_oval(54+50*x,55+50*y,46+50*(x+1),47+50*(y+1),tags="tile",fill="#000",outline="#000")
 						screen.create_oval(54+50*x,52+50*y,46+50*(x+1),44+50*(y+1),tags="tile",fill="#111",outline="#111")
-					if self.player = 1:
+					if self.player == 0:
 						if self.valid(x,y):
 							screen.create_oval(68+50*x,68+50*y,32+50*(x+1),32+50*(y+1),tags="highlight",fill="#008000",outline="#008000")
 			#Draw the scoreboard and update the screen
