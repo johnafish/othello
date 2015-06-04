@@ -527,16 +527,18 @@ def decentHeuristic(array,player):
 #Midgame (17-32 move): Value Corners and edges (decentHeuristic)
 #Endgame: Make the move that is the most valuable for owning any pieces (dumbScore)
 def finalHeuristic(array,player):
-	if moves<=16:
+	if moves<=8:
 		numMoves = 0
 		for x in range(8):
 			for y in range(8):
 				if valid(array,player,x,y):
 					numMoves += 1
 		return numMoves
-	elif moves<=48:
+	elif moves<=16:
+		return -decentHeuristic(array,1-player)
+	elif moves<=52:
 		return decentHeuristic(array,player)
-	elif moves<=56:
+	elif moves<=58:
 		return slightlyLessDumbScore(array,player)
 	else:
 		return dumbScore(array,player)
