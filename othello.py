@@ -19,7 +19,7 @@ depth = 4
 moves = 0
 #Tkinter setup
 root = Tk()
-screen = Canvas(root, width=500, height=600, background="#444",highlightthickness=0)
+screen = Canvas(root, width=500, height=600, background="#222",highlightthickness=0)
 screen.pack()
 
 class Board:
@@ -403,17 +403,17 @@ def move(passedArray,x,y):
 def drawGridBackground(outline=False):
 	#If we want an outline on the board then draw one
 	if outline:
-		screen.create_rectangle(50,50,450,450,outline="#222")
+		screen.create_rectangle(50,50,450,450,outline="#111")
 
 	#Drawing the intermediate lines
 	for i in range(7):
 		lineShift = 50+50*(i+1)
 
 		#Horizontal line
-		screen.create_line(50,lineShift,450,lineShift,fill="#222")
+		screen.create_line(50,lineShift,450,lineShift,fill="#111")
 
 		#Vertical line
-		screen.create_line(lineShift,50,lineShift,450,fill="#222")
+		screen.create_line(lineShift,50,lineShift,450,fill="#111")
 
 	screen.update()
 
