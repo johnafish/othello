@@ -609,7 +609,6 @@ def clickHandle(event):
 			#Delete the highlights
 			x = int((event.x-50)/50)
 			y = int((event.y-50)/50)
-			screen.delete("highlight")
 			#Determine the grid index for where the mouse was clicked
 			
 			#If the click is inside the bounds and the move is valid, move to that location
