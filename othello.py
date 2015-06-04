@@ -15,6 +15,7 @@ from time import *
 from random import *
 from copy import deepcopy
 nodes = 0
+depth = 4
 #Tkinter setup
 root = Tk()
 screen = Canvas(root, width=500, height=600, background="#444",highlightthickness=0)
@@ -41,21 +42,29 @@ class Board:
 
 	#Updating the board to the screen
 	def update(self):
+		screen.delete("highlight")
+		screen.delete("tile")
 		if not self.won:
 			for x in range(8):
 				for y in range(8):
 					#Could replace the circles with images later, if I want
 					if self.array[x][y]=="w":
-						screen.create_oval(52+50*x,52+50*y,48+50*(x+1),48+50*(y+1),fill="white",outline="white")
-					if self.array[x][y]=="b":
-						screen.create_oval(52+50*x,52+50*y,48+50*(x+1),48+50*(y+1),fill="black",outline="black")
+						screen.create_oval(54+50*x,55+50*y,46+50*(x+1),47+50*(y+1),tags="tile",fill="#aaa",outline="#aaa")
+						screen.create_oval(54+50*x,52+50*y,46+50*(x+1),44+50*(y+1),tags="tile",fill="#fff",outline="#fff")
+
+					elif self.array[x][y]=="b":
+						screen.create_oval(54+50*x,55+50*y,46+50*(x+1),47+50*(y+1),tags="tile",fill="#111",outline="#111")
+						screen.create_oval(54+50*x,52+50*y,46+50*(x+1),44+50*(y+1),tags="tile",fill="#000",outline="#000")
+
+					if self.valid(x,y):
+						screen.create_oval(68+50*x,68+50*y,32+50*(x+1),32+50*(y+1),tags="highlight",fill="#008000",outline="#008000")
 			#Draw the scoreboard and update the screen
 			self.drawScoreBoard()
 			screen.update()
 			#If the computer is AI, make a move
 			if self.player==1:
 				startTime = time()
-				self.array = self.alphaBeta(self.array,4,-float("inf"),float("inf"),1)[1]
+				self.array = self.alphaBeta(self.array,depth,-float("inf"),float("inf"),1)[1]
 				self.player = 1-self.player
 				deltaTime = round((time()-startTime)*100)/100
 				if deltaTime<2:
@@ -454,6 +463,9 @@ def slightlyLessDumbScore(array,player):
 
 def decentHeuristic(array,player):
 	score = 0
+	cornerVal = 15
+	adjacentVal = 5
+	sideVal = 3
 	#Set player and opponent colours
 	if player==1:
 		colour="b"
@@ -466,36 +478,36 @@ def decentHeuristic(array,player):
 		for y in range(8):
 			#Normal tiles worth 1
 			add = 1
-			cornerVal = 15
+			
 			#Adjacent to corners are worth -3
 
 			if (x==0 and y==1) or (x==1 and 0<=y<=1):
 				if array[0][0]==colour:
-					add = 3
+					add = sideVal
 				else:
-					add = -cornerVal
+					add = -adjacentVal
 
 
 			elif (x==0 and y==6) or (x==1 and 6<=y<=7):
 				if array[7][0]==colour:
-					add = 3
+					add = sideVal
 				else:
-					add = -cornerVal
+					add = -adjacentVal
 
 			elif (x==7 and y==1) or (x==6 and 0<=y<=1):
 				if array[0][7]==colour:
-					add = 3
+					add = sideVal
 				else:
-					add = -cornerVal
+					add = -adjacentVal
 
 			elif (x==7 and y==6) or (x==6 and 6<=y<=7):
 				if array[7][7]==colour:
-					add = 3
+					add = sideVal
 				else:
-					add = -cornerVal
+					add = -adjacentVal
 			#Edge tiles worth 3
 			elif (x==0 and 1<y<6) or (x==7 and 1<y<6) or (y==0 and 1<x<6) or (y==7 and 1<x<6):
-				add=3
+				add=sideVal
 			#Corner tiles worth 15
 			elif (x==0 and y==0) or (x==0 and y==7) or (x==7 and y==0) or (x==7 and y==7):
 				add = cornerVal
@@ -505,23 +517,6 @@ def decentHeuristic(array,player):
 			elif array[x][y]==opponent:
 				score-=add
 	return score
-#When mouse moves, we want a green highlight to appear for valid moves
-def mouseMovementHandle(event):
-	#Is it the player's turn?
-	if board.player==0:
-		#Delete the other highlight(s)
-		screen.delete("highlight")
-
-		#Determine the grid index for where the mouse is
-		xMouse = event.x
-		yMouse = event.y
-		x = int((event.x-50)/50)
-		y = int((event.y-50)/50)
-		#If we're inside the board, test validity
-		if 0<=x<=7 and 0<=y<=7:
-			if board.valid(x,y):
-				#Create a green highlight if it's a valid move
-				screen.create_oval(52+50*x,52+50*y,48+50*(x+1),48+50*(y+1),tags="highlight",fill="green",outline="green")
 
 #When the user clicks, if it's a valid move, make the move
 def clickHandle(event):
@@ -571,7 +566,6 @@ def runGame():
 runGame()
 
 #Binding, setting
-screen.bind("<Motion>", mouseMovementHandle)
 screen.bind("<Button-1>", clickHandle)
 screen.focus_set()
 
