@@ -15,7 +15,7 @@ from time import *
 from random import *
 from copy import deepcopy
 nodes = 0
-depth = 4
+depth = 6
 moves = 0
 #Tkinter setup
 root = Tk()
@@ -127,6 +127,23 @@ class Board:
 	#FUNCTION: Checks if a move is valid: returns True or False
 	def valid(self,x,y):
 		return valid(self.array,self.player,x,y)
+
+	#METHOD: Test if player must pass: if they do, switch the player
+	def passTest(self):
+		mustPass = True
+		for x in range(8):
+			for y in range(8):
+				if self.valid(x,y):
+					mustPass=False
+		if mustPass:
+			self.player = 1-self.player
+			if self.passed==True:
+				self.won = True
+			else:
+				self.passed = True
+			self.update()
+		else:
+			self.passed = False
 
 	#METHOD: Stupid AI - Chooses a random move
 	def dumbMove(self):
