@@ -84,15 +84,13 @@ class Board:
 		#Move and update screen
 		self.array = move(self.array,x,y)
 		
-		
 		#Switch Player
 		self.player = 1-self.player
 		self.update()
 		
 		#Check if ai must pass
 		self.passTest()
-		self.update()
-			
+		self.update()	
 
 	#METHOD: Draws scoreboard to screen
 	def drawScoreBoard(self):
@@ -128,76 +126,7 @@ class Board:
 
 	#FUNCTION: Checks if a move is valid: returns True or False
 	def valid(self,x,y):
-		#Sets player colour
-		if self.player==0:
-			colour="w"
-		else:
-			colour="b"
-			
-		#If there's already a piece there, it's an invalid move
-		if self.array[x][y]!=None:
-			return False
-
-		else:
-			#Generating the list of neighbours
-			neighbour = False
-			neighbours = []
-			for i in range(max(0,x-1),min(x+2,8)):
-				for j in range(max(0,y-1),min(y+2,8)):
-					if self.array[i][j]!=None:
-						neighbour=True
-						neighbours.append([i,j])
-			#If there's no neighbours, it's an invalid move
-			if not neighbour:
-				return False
-			else:
-				#Iterating through neighbours to determine if at least one line is formed
-				valid = False
-				for neighbour in neighbours:
-
-					neighX = neighbour[0]
-					neighY = neighbour[1]
-					
-					#If the neighbour colour is equal to your colour, it doesn't form a line
-					#Go onto the next neighbour
-					if self.array[neighX][neighY]==colour:
-						continue
-					else:
-						#Determine the direction of the line
-						deltaX = neighX-x
-						deltaY = neighY-y
-						tempX = neighX
-						tempY = neighY
-
-						while 0<=tempX<=7 and 0<=tempY<=7:
-							#If an empty space, no line is formed
-							if self.array[tempX][tempY]==None:
-								break
-							#If it reaches a piece of the player's colour, it forms a line
-							if self.array[tempX][tempY]==colour:
-								valid=True
-								break
-							#Move the index according to the direction of the line
-							tempX+=deltaX
-							tempY+=deltaY
-				return valid
-
-	#METHOD: Test if player must pass: if they do, switch the player
-	def passTest(self):
-		mustPass = True
-		for x in range(8):
-			for y in range(8):
-				if self.valid(x,y):
-					mustPass=False
-		if mustPass:
-			self.player = 1-self.player
-			if self.passed==True:
-				self.won = True
-			else:
-				self.passed = True
-			self.update()
-		else:
-			self.passed = False
+		return valid(self.array,self.player,x,y)
 
 	#METHOD: Stupid AI - Chooses a random move
 	def dumbMove(self):
@@ -258,8 +187,8 @@ class Board:
 		#Move to the best location based on slightlyLessDumbScore()
 		self.boardMove(choices[bestIndex][0],choices[bestIndex][1])
 
-
-	#This will contain minimax... later.
+	#This contains the minimax algorithm
+	#http://en.wikipedia.org/wiki/Minimax
 	def minimax(self, node, depth, maximizing):
 		global nodes
 		nodes += 1
@@ -296,6 +225,8 @@ class Board:
 					bestBoard = board
 			return ([bestValue,bestBoard])
 
+	#alphaBeta pruning on the minimax tree
+	#http://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning
 	def alphaBeta(self,node,depth,alpha,beta,maximizing):
 		global nodes
 		nodes += 1
@@ -336,6 +267,7 @@ class Board:
 				if beta<=alpha:
 					break
 			return([v,bestBoard])
+
 #FUNCTION: Returns a board after making a move according to Othello rules
 #Assumes the move is valid
 def move(passedArray,x,y):
@@ -399,7 +331,6 @@ def move(passedArray,x,y):
 
 	return array
 
-
 #Method for drawing the gridlines
 def drawGridBackground(outline=False):
 	#If we want an outline on the board then draw one
@@ -417,7 +348,6 @@ def drawGridBackground(outline=False):
 		screen.create_line(lineShift,50,lineShift,450,fill="#111")
 
 	screen.update()
-
 
 #Simple heuristic. Compares number of each tile.
 def dumbScore(array,player):
@@ -466,6 +396,8 @@ def slightlyLessDumbScore(array,player):
 				score-=add
 	return score
 
+#Heuristic that weights corner tiles and edge tiles as positive, adjacent to corners (if the corner is not yours) as negative
+#Weights other tiles as one point
 def decentHeuristic(array,player):
 	score = 0
 	cornerVal = 25
@@ -543,6 +475,8 @@ def finalHeuristic(array,player):
 		return slightlyLessDumbScore(array,player)
 	else:
 		return dumbScore(array,player)
+
+#Checks if a move is valid for a given array.
 def valid(array,player,x,y):
 	#Sets player colour
 	if player==0:
@@ -637,6 +571,7 @@ def create_buttons():
 
 		screen.create_line(455,5,495,45,fill="white",width="3")
 		screen.create_line(495,5,455,45,fill="white",width="3")
+
 def runGame():
 	global board
 	screen.delete(ALL)
