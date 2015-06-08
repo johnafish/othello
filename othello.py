@@ -469,7 +469,7 @@ def slightlyLessDumbScore(array,player):
 def decentHeuristic(array,player):
 	score = 0
 	cornerVal = 25
-	adjacentVal = 15
+	adjacentVal = 5
 	sideVal = 5
 	#Set player and opponent colours
 	if player==1:
@@ -534,7 +534,7 @@ def finalHeuristic(array,player):
 			for y in range(8):
 				if valid(array,player,x,y):
 					numMoves += 1
-		return numMoves
+		return numMoves+decentHeuristic(array,player)
 	elif moves<=16:
 		return -decentHeuristic(array,1-player)
 	elif moves<=52:
