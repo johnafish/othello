@@ -618,6 +618,14 @@ def clickHandle(event):
 			if 0<=x<=7 and 0<=y<=7:
 				if board.valid(x,y):
 					board.boardMove(x,y)
+
+def keyHandle(event):
+	symbol = event.keysym
+	if symbol.lower()=="r":
+		runGame()
+	elif symbol.lower()=="q":
+		root.destroy()
+
 def create_buttons():
 		screen.create_rectangle(0,5,50,55,fill="#000033", outline="#000033")
 		screen.create_rectangle(0,0,50,50,fill="#000088", outline="#000088")
@@ -646,6 +654,7 @@ runGame()
 
 #Binding, setting
 screen.bind("<Button-1>", clickHandle)
+screen.bind("<Key>",keyHandle)
 screen.focus_set()
 
 #Run forever
