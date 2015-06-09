@@ -613,29 +613,41 @@ def valid(array,player,x,y):
 
 #When the user clicks, if it's a valid move, make the move
 def clickHandle(event):
+	global depth
 	xMouse = event.x
 	yMouse = event.y
-	if xMouse>=450 and yMouse<=50:
-		root.destroy()
-	elif xMouse<=50 and yMouse<=50:
-		runGame()
+	if running:
+		if xMouse>=450 and yMouse<=50:
+			root.destroy()
+		elif xMouse<=50 and yMouse<=50:
+			playGame()
+		else:
+			#Is it the player's turn?
+			if board.player==0:
+				#Delete the highlights
+				x = int((event.x-50)/50)
+				y = int((event.y-50)/50)
+				#Determine the grid index for where the mouse was clicked
+				
+				#If the click is inside the bounds and the move is valid, move to that location
+				if 0<=x<=7 and 0<=y<=7:
+					if valid(board.array,board.player,x,y):
+						board.boardMove(x,y)
 	else:
-		#Is it the player's turn?
-		if board.player==0:
-			#Delete the highlights
-			x = int((event.x-50)/50)
-			y = int((event.y-50)/50)
-			#Determine the grid index for where the mouse was clicked
-			
-			#If the click is inside the bounds and the move is valid, move to that location
-			if 0<=x<=7 and 0<=y<=7:
-				if valid(board.array,board.player,x,y):
-					board.boardMove(x,y)
-
+		if 300<=yMouse<=350:
+			if 25<=xMouse<=155:
+				difficulty = 0
+				playGame()
+			elif 180<=xMouse<=310:
+				depth = 4
+				playGame()
+			elif 335<=xMouse<=465:
+				depth = 6
+				playGame()
 def keyHandle(event):
 	symbol = event.keysym
 	if symbol.lower()=="r":
-		runGame()
+		playGame()
 	elif symbol.lower()=="q":
 		root.destroy()
 
@@ -651,8 +663,31 @@ def create_buttons():
 		screen.create_line(455,5,495,45,fill="white",width="3")
 		screen.create_line(495,5,455,45,fill="white",width="3")
 
+def createStar(centerX,centerY):
+	pass
+	
 def runGame():
-	global board
+	global running
+	running = False
+	screen.create_text(250,203,anchor="c",text="Othello",font=("Consolas", 50),fill="#aaa")
+	screen.create_text(250,200,anchor="c",text="Othello",font=("Consolas", 50),fill="#fff")
+	
+	for i in range(3):
+
+		screen.create_rectangle(25+155*i, 310, 155+155*i, 355, fill="#000", outline="#000")
+		screen.create_rectangle(25+155*i, 300, 155+155*i, 350, fill="#111", outline="#111")
+
+		spacing = 130/(i+2)
+		for x in range(i+1):
+			screen.create_text(25+(x+1)*spacing+155*i,326,anchor="c",text="\u2605", font=("Consolas", 25),fill="#b29600")
+			screen.create_text(25+(x+1)*spacing+155*i,327,anchor="c",text="\u2605", font=("Consolas",25),fill="#b29600")
+			screen.create_text(25+(x+1)*spacing+155*i,325,anchor="c",text="\u2605", font=("Consolas", 25),fill="#ffd700")
+
+	screen.update()
+
+def playGame():
+	global board, running
+	running = True
 	screen.delete(ALL)
 	create_buttons()
 	board = 0
