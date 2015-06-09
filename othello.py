@@ -566,7 +566,7 @@ def clickHandle(event):
 			
 			#If the click is inside the bounds and the move is valid, move to that location
 			if 0<=x<=7 and 0<=y<=7:
-				if board.valid(x,y):
+				if valid(board.array,board.player,x,y):
 					board.boardMove(x,y)
 
 def keyHandle(event):
