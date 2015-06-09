@@ -61,20 +61,20 @@ class Board:
 					screen.create_oval(54+50*x,55+50*y,46+50*(x+1),47+50*(y+1),tags="tile",fill="#000",outline="#000")
 					screen.create_oval(54+50*x,52+50*y,46+50*(x+1),44+50*(y+1),tags="tile",fill="#111",outline="#111")
 			
-
+		screen.update()
 		for x in range(8):
 			for y in range(8):
 				#Could replace the circles with images later, if I want
 				if self.array[x][y]!=self.oldarray[x][y] and self.array[x][y]=="w":
+					sleep(0.1)
 					screen.create_oval(54+50*x,55+50*y,46+50*(x+1),47+50*(y+1),tags="tile",fill="#aaa",outline="#aaa")
 					screen.create_oval(54+50*x,52+50*y,46+50*(x+1),44+50*(y+1),tags="tile",fill="#fff",outline="#fff")
-					sleep(0.3)
 					screen.update()
 
 				elif self.array[x][y]!=self.oldarray[x][y] and self.array[x][y]=="b":
+					sleep(0.1)
 					screen.create_oval(54+50*x,55+50*y,46+50*(x+1),47+50*(y+1),tags="tile",fill="#000",outline="#000")
 					screen.create_oval(54+50*x,52+50*y,46+50*(x+1),44+50*(y+1),tags="tile",fill="#111",outline="#111")
-					sleep(0.3)
 					screen.update()
 		for x in range(8):
 			for y in range(8):
@@ -90,7 +90,13 @@ class Board:
 			if self.player==1:
 				startTime = time()
 				self.oldarray = self.array
-				self.array = self.alphaBeta(self.array,depth,-float("inf"),float("inf"),1)[1]
+				alphaBetaResult = self.alphaBeta(self.array,depth,-float("inf"),float("inf"),1)
+				self.array = alphaBetaResult[1]
+
+				if len(alphaBetaResult)==3:
+					position = alphaBetaResult[2]
+					self.oldarray[position[0]][position[1]]="b"
+
 				self.player = 1-self.player
 				deltaTime = round((time()-startTime)*100)/100
 				if deltaTime<2:
@@ -106,6 +112,7 @@ class Board:
 		global nodes
 		#Move and update screen
 		self.oldarray = self.array
+		self.oldarray[x][y]="w"
 		self.array = move(self.array,x,y)
 		
 		#Switch Player
@@ -283,15 +290,17 @@ class Board:
 		if maximizing:
 			v = -float("inf")
 			bestBoard = []
+			bestChoice = []
 			for board in boards:
 				boardValue = self.alphaBeta(board,depth-1,alpha,beta,0)[0]
 				if boardValue>v:
 					v = boardValue
 					bestBoard = board
+					bestChoice = choices[boards.index(board)]
 				alpha = max(alpha,v)
 				if beta <= alpha:
 					break
-			return([v,bestBoard])
+			return([v,bestBoard,bestChoice])
 		else:
 			v = float("inf")
 			bestBoard = []
@@ -301,10 +310,11 @@ class Board:
 				if boardValue<v:
 					v = boardValue
 					bestBoard = board
+					bestChoice = choices[boards.index(board)]
 				beta = min(beta,v)
 				if beta<=alpha:
 					break
-			return([v,bestBoard])
+			return([v,bestBoard,bestChoice])
 
 #FUNCTION: Returns a board after making a move according to Othello rules
 #Assumes the move is valid
