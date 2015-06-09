@@ -54,27 +54,58 @@ class Board:
 			for y in range(8):
 				#Could replace the circles with images later, if I want
 				if self.oldarray[x][y]=="w":
-					screen.create_oval(54+50*x,55+50*y,46+50*(x+1),47+50*(y+1),tags="tile",fill="#aaa",outline="#aaa")
-					screen.create_oval(54+50*x,52+50*y,46+50*(x+1),44+50*(y+1),tags="tile",fill="#fff",outline="#fff")
+					screen.create_oval(54+50*x,54+50*y,96+50*x,96+50*y,tags="tile {0}-{1}".format(x,y),fill="#aaa",outline="#aaa")
+					screen.create_oval(54+50*x,52+50*y,96+50*x,94+50*y,tags="tile {0}-{1}".format(x,y),fill="#fff",outline="#fff")
 
 				elif self.oldarray[x][y]=="b":
-					screen.create_oval(54+50*x,55+50*y,46+50*(x+1),47+50*(y+1),tags="tile",fill="#000",outline="#000")
-					screen.create_oval(54+50*x,52+50*y,46+50*(x+1),44+50*(y+1),tags="tile",fill="#111",outline="#111")
+					screen.create_oval(54+50*x,54+50*y,96+50*x,96+50*y,tags="tile {0}-{1}".format(x,y),fill="#000",outline="#000")
+					screen.create_oval(54+50*x,52+50*y,96+50*x,94+50*y,tags="tile {0}-{1}".format(x,y),fill="#111",outline="#111")
 			
 		screen.update()
 		for x in range(8):
 			for y in range(8):
 				#Could replace the circles with images later, if I want
 				if self.array[x][y]!=self.oldarray[x][y] and self.array[x][y]=="w":
-					sleep(0.1)
-					screen.create_oval(54+50*x,55+50*y,46+50*(x+1),47+50*(y+1),tags="tile",fill="#aaa",outline="#aaa")
-					screen.create_oval(54+50*x,52+50*y,46+50*(x+1),44+50*(y+1),tags="tile",fill="#fff",outline="#fff")
+					screen.delete("{0}-{1}".format(x,y))
+					#42 is width of tile so 21 is half of that
+					for i in range(21):
+						screen.create_oval(54+i+50*x,54+i+50*y,96-i+50*x,96-i+50*y,tags="tile animated",fill="#000",outline="#000")
+						screen.create_oval(54+i+50*x,52+i+50*y,96-i+50*x,94-i+50*y,tags="tile animated",fill="#111",outline="#111")
+						if i%3==0:
+							sleep(0.01)
+						screen.update()
+						screen.delete("animated")
+					for i in reversed(range(21)):
+						screen.create_oval(54+i+50*x,54+i+50*y,96-i+50*x,96-i+50*y,tags="tile animated",fill="#aaa",outline="#aaa")
+						screen.create_oval(54+i+50*x,52+i+50*y,96-i+50*x,94-i+50*y,tags="tile animated",fill="#fff",outline="#fff")
+						if i%3==0:
+							sleep(0.01)
+						screen.update()
+						screen.delete("animated")
+					screen.create_oval(54+50*x,54+50*y,96+50*x,96+50*y,tags="tile",fill="#aaa",outline="#aaa")
+					screen.create_oval(54+50*x,52+50*y,96+50*x,94+50*y,tags="tile",fill="#fff",outline="#fff")
 					screen.update()
 
 				elif self.array[x][y]!=self.oldarray[x][y] and self.array[x][y]=="b":
-					sleep(0.1)
-					screen.create_oval(54+50*x,55+50*y,46+50*(x+1),47+50*(y+1),tags="tile",fill="#000",outline="#000")
-					screen.create_oval(54+50*x,52+50*y,46+50*(x+1),44+50*(y+1),tags="tile",fill="#111",outline="#111")
+					screen.delete("{0}-{1}".format(x,y))
+					#42 is width of tile so 21 is half of that
+					for i in range(21):
+						screen.create_oval(54+i+50*x,54+i+50*y,96-i+50*x,96-i+50*y,tags="tile animated",fill="#aaa",outline="#aaa")
+						screen.create_oval(54+i+50*x,52+i+50*y,96-i+50*x,94-i+50*y,tags="tile animated",fill="#fff",outline="#fff")
+						if i%3==0:
+							sleep(0.01)
+						screen.update()
+						screen.delete("animated")
+					for i in reversed(range(21)):
+						screen.create_oval(54+i+50*x,54+i+50*y,96-i+50*x,96-i+50*y,tags="tile animated",fill="#000",outline="#000")
+						screen.create_oval(54+i+50*x,52+i+50*y,96-i+50*x,94-i+50*y,tags="tile animated",fill="#111",outline="#111")
+						if i%3==0:
+							sleep(0.01)
+						screen.update()
+						screen.delete("animated")
+
+					screen.create_oval(54+50*x,54+50*y,96+50*x,96+50*y,tags="tile",fill="#000",outline="#000")
+					screen.create_oval(54+50*x,52+50*y,96+50*x,94+50*y,tags="tile",fill="#111",outline="#111")
 					screen.update()
 		for x in range(8):
 			for y in range(8):
