@@ -20,9 +20,9 @@ If you wish to restart or create a new game, you may press the "Restart" button 
 
 ###TO DO:
 - Good win/loss indicator
-- Animation for changing tiles
 
 ###DONE:
 - Better AI (minimax with alpha beta pruning is end-goal)
 - Player turn indicator
 - Restart/Quit GUI
+- Animation for changing tiles
