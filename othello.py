@@ -44,24 +44,75 @@ class Board:
 		self.array[4][3]="b"
 		self.array[4][4]="w"
 
+		#Initializing old values
+		self.oldarray = self.array
 	#Updating the board to the screen
 	def update(self):
 		screen.delete("highlight")
 		screen.delete("tile")
-		
 		for x in range(8):
 			for y in range(8):
 				#Could replace the circles with images later, if I want
-				if self.array[x][y]=="w":
-					screen.create_oval(54+50*x,55+50*y,46+50*(x+1),47+50*(y+1),tags="tile",fill="#aaa",outline="#aaa")
-					screen.create_oval(54+50*x,52+50*y,46+50*(x+1),44+50*(y+1),tags="tile",fill="#fff",outline="#fff")
+				if self.oldarray[x][y]=="w":
+					screen.create_oval(54+50*x,54+50*y,96+50*x,96+50*y,tags="tile {0}-{1}".format(x,y),fill="#aaa",outline="#aaa")
+					screen.create_oval(54+50*x,52+50*y,96+50*x,94+50*y,tags="tile {0}-{1}".format(x,y),fill="#fff",outline="#fff")
 
-				elif self.array[x][y]=="b":
-					screen.create_oval(54+50*x,55+50*y,46+50*(x+1),47+50*(y+1),tags="tile",fill="#000",outline="#000")
-					screen.create_oval(54+50*x,52+50*y,46+50*(x+1),44+50*(y+1),tags="tile",fill="#111",outline="#111")
+				elif self.oldarray[x][y]=="b":
+					screen.create_oval(54+50*x,54+50*y,96+50*x,96+50*y,tags="tile {0}-{1}".format(x,y),fill="#000",outline="#000")
+					screen.create_oval(54+50*x,52+50*y,96+50*x,94+50*y,tags="tile {0}-{1}".format(x,y),fill="#111",outline="#111")
+			
+		screen.update()
+		for x in range(8):
+			for y in range(8):
+				#Could replace the circles with images later, if I want
+				if self.array[x][y]!=self.oldarray[x][y] and self.array[x][y]=="w":
+					screen.delete("{0}-{1}".format(x,y))
+					#42 is width of tile so 21 is half of that
+					for i in range(21):
+						screen.create_oval(54+i+50*x,54+i+50*y,96-i+50*x,96-i+50*y,tags="tile animated",fill="#000",outline="#000")
+						screen.create_oval(54+i+50*x,52+i+50*y,96-i+50*x,94-i+50*y,tags="tile animated",fill="#111",outline="#111")
+						if i%3==0:
+							sleep(0.01)
+						screen.update()
+						screen.delete("animated")
+					for i in reversed(range(21)):
+						screen.create_oval(54+i+50*x,54+i+50*y,96-i+50*x,96-i+50*y,tags="tile animated",fill="#aaa",outline="#aaa")
+						screen.create_oval(54+i+50*x,52+i+50*y,96-i+50*x,94-i+50*y,tags="tile animated",fill="#fff",outline="#fff")
+						if i%3==0:
+							sleep(0.01)
+						screen.update()
+						screen.delete("animated")
+					screen.create_oval(54+50*x,54+50*y,96+50*x,96+50*y,tags="tile",fill="#aaa",outline="#aaa")
+					screen.create_oval(54+50*x,52+50*y,96+50*x,94+50*y,tags="tile",fill="#fff",outline="#fff")
+					screen.update()
+
+				elif self.array[x][y]!=self.oldarray[x][y] and self.array[x][y]=="b":
+					screen.delete("{0}-{1}".format(x,y))
+					#42 is width of tile so 21 is half of that
+					for i in range(21):
+						screen.create_oval(54+i+50*x,54+i+50*y,96-i+50*x,96-i+50*y,tags="tile animated",fill="#aaa",outline="#aaa")
+						screen.create_oval(54+i+50*x,52+i+50*y,96-i+50*x,94-i+50*y,tags="tile animated",fill="#fff",outline="#fff")
+						if i%3==0:
+							sleep(0.01)
+						screen.update()
+						screen.delete("animated")
+					for i in reversed(range(21)):
+						screen.create_oval(54+i+50*x,54+i+50*y,96-i+50*x,96-i+50*y,tags="tile animated",fill="#000",outline="#000")
+						screen.create_oval(54+i+50*x,52+i+50*y,96-i+50*x,94-i+50*y,tags="tile animated",fill="#111",outline="#111")
+						if i%3==0:
+							sleep(0.01)
+						screen.update()
+						screen.delete("animated")
+
+					screen.create_oval(54+50*x,54+50*y,96+50*x,96+50*y,tags="tile",fill="#000",outline="#000")
+					screen.create_oval(54+50*x,52+50*y,96+50*x,94+50*y,tags="tile",fill="#111",outline="#111")
+					screen.update()
+		for x in range(8):
+			for y in range(8):
 				if self.player == 0:
 					if valid(self.array,self.player,x,y):
 						screen.create_oval(68+50*x,68+50*y,32+50*(x+1),32+50*(y+1),tags="highlight",fill="#008000",outline="#008000")
+
 		if not self.won:
 			#Draw the scoreboard and update the screen
 			self.drawScoreBoard()
@@ -69,13 +120,19 @@ class Board:
 			#If the computer is AI, make a move
 			if self.player==1:
 				startTime = time()
-				self.array = self.alphaBeta(self.array,depth,-float("inf"),float("inf"),1)[1]
+				self.oldarray = self.array
+				alphaBetaResult = self.alphaBeta(self.array,depth,-float("inf"),float("inf"),1)
+				self.array = alphaBetaResult[1]
+
+				if len(alphaBetaResult)==3:
+					position = alphaBetaResult[2]
+					self.oldarray[position[0]][position[1]]="b"
+
 				self.player = 1-self.player
 				deltaTime = round((time()-startTime)*100)/100
 				if deltaTime<2:
 					sleep(2-deltaTime)
 				nodes = 0
-				self.update()
 				#Player must pass?
 				self.passTest()
 		else:
@@ -85,6 +142,8 @@ class Board:
 	def boardMove(self,x,y):
 		global nodes
 		#Move and update screen
+		self.oldarray = self.array
+		self.oldarray[x][y]="w"
 		self.array = move(self.array,x,y)
 		
 		#Switch Player
@@ -262,27 +321,31 @@ class Board:
 		if maximizing:
 			v = -float("inf")
 			bestBoard = []
+			bestChoice = []
 			for board in boards:
 				boardValue = self.alphaBeta(board,depth-1,alpha,beta,0)[0]
 				if boardValue>v:
 					v = boardValue
 					bestBoard = board
+					bestChoice = choices[boards.index(board)]
 				alpha = max(alpha,v)
 				if beta <= alpha:
 					break
-			return([v,bestBoard])
+			return([v,bestBoard,bestChoice])
 		else:
 			v = float("inf")
 			bestBoard = []
+			bestChoice = []
 			for board in boards:
 				boardValue = self.alphaBeta(board,depth-1,alpha,beta,1)[0]
 				if boardValue<v:
 					v = boardValue
 					bestBoard = board
+					bestChoice = choices[boards.index(board)]
 				beta = min(beta,v)
 				if beta<=alpha:
 					break
-			return([v,bestBoard])
+			return([v,bestBoard,bestChoice])
 
 #FUNCTION: Returns a board after making a move according to Othello rules
 #Assumes the move is valid
