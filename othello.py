@@ -14,9 +14,12 @@ from math import *
 from time import *
 from random import *
 from copy import deepcopy
+
+#Variable setup
 nodes = 0
-depth = 6
+depth = 4
 moves = 0
+
 #Tkinter setup
 root = Tk()
 screen = Canvas(root, width=500, height=600, background="#222",highlightthickness=0)
@@ -57,7 +60,7 @@ class Board:
 					screen.create_oval(54+50*x,55+50*y,46+50*(x+1),47+50*(y+1),tags="tile",fill="#000",outline="#000")
 					screen.create_oval(54+50*x,52+50*y,46+50*(x+1),44+50*(y+1),tags="tile",fill="#111",outline="#111")
 				if self.player == 0:
-					if self.valid(x,y):
+					if valid(self.array,self.player,x,y):
 						screen.create_oval(68+50*x,68+50*y,32+50*(x+1),32+50*(y+1),tags="highlight",fill="#008000",outline="#008000")
 		if not self.won:
 			#Draw the scoreboard and update the screen
@@ -124,16 +127,12 @@ class Board:
 
 		moves = player_score+computer_score
 
-	#FUNCTION: Checks if a move is valid: returns True or False
-	def valid(self,x,y):
-		return valid(self.array,self.player,x,y)
-
 	#METHOD: Test if player must pass: if they do, switch the player
 	def passTest(self):
 		mustPass = True
 		for x in range(8):
 			for y in range(8):
-				if self.valid(x,y):
+				if valid(self.array,self.player,x,y):
 					mustPass=False
 		if mustPass:
 			self.player = 1-self.player
@@ -151,11 +150,11 @@ class Board:
 		choices = []
 		for x in range(8):
 			for y in range(8):
-				if self.valid(x,y):
+				if valid(self.array,self.player,x,y):
 					choices.append([x,y])
 		#Chooses a random move, moves there
 		dumbChoice = choice(choices)
-		self.boardMove(dumbChoice[0],dumbChoice[1])
+		self.arrayMove(dumbChoice[0],dumbChoice[1])
 
 	#METHOD: Not so stupid AI - Chooses a move based on what will get it the most pieces next turn
 	def slightlyLessDumbMove(self):
@@ -164,7 +163,7 @@ class Board:
 		choices = []
 		for x in range(8):
 			for y in range(8):
-				if self.valid(x,y):
+				if valid(self.array,self.player,x,y):
 					test = move(self.array,x,y)
 					boards.append(test)
 					choices.append([x,y])
@@ -178,7 +177,7 @@ class Board:
 				bestIndex=i
 				bestScore = score
 		#Move to the best location based on dumbScore()
-		self.boardMove(choices[bestIndex][0],choices[bestIndex][1])
+		self.arrayMove(choices[bestIndex][0],choices[bestIndex][1])
 
 	#METHOD: Actually Decent AI - Choose a move based on a simple heuristic
 	#Same as slightlyLessDumbMove() just uses slightlyLessDumbScore()
@@ -188,7 +187,7 @@ class Board:
 		choices = []
 		for x in range(8):
 			for y in range(8):
-				if self.valid(x,y):
+				if valid(self.array,self.player,x,y):
 					test = move(self.array,x,y)
 					boards.append(test)
 					choices.append([x,y])
@@ -202,7 +201,7 @@ class Board:
 				bestIndex=i
 				bestScore = score
 		#Move to the best location based on slightlyLessDumbScore()
-		self.boardMove(choices[bestIndex][0],choices[bestIndex][1])
+		self.arrayMove(choices[bestIndex][0],choices[bestIndex][1])
 
 	#This contains the minimax algorithm
 	#http://en.wikipedia.org/wiki/Minimax
@@ -214,7 +213,7 @@ class Board:
 
 		for x in range(8):
 			for y in range(8):
-				if self.valid(x,y):
+				if valid(self.array,self.player,x,y):
 					test = move(node,x,y)
 					boards.append(test)
 					choices.append([x,y])
@@ -252,7 +251,7 @@ class Board:
 
 		for x in range(8):
 			for y in range(8):
-				if self.valid(x,y):
+				if valid(self.array,self.player,x,y):
 					test = move(node,x,y)
 					boards.append(test)
 					choices.append([x,y])
