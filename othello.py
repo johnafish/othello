@@ -68,6 +68,7 @@ class Board:
 				if self.array[x][y]!=self.oldarray[x][y] and self.array[x][y]=="w":
 					screen.delete("{0}-{1}".format(x,y))
 					#42 is width of tile so 21 is half of that
+					#Shrinking
 					for i in range(21):
 						screen.create_oval(54+i+50*x,54+i+50*y,96-i+50*x,96-i+50*y,tags="tile animated",fill="#000",outline="#000")
 						screen.create_oval(54+i+50*x,52+i+50*y,96-i+50*x,94-i+50*y,tags="tile animated",fill="#111",outline="#111")
@@ -75,6 +76,7 @@ class Board:
 							sleep(0.01)
 						screen.update()
 						screen.delete("animated")
+					#Growing
 					for i in reversed(range(21)):
 						screen.create_oval(54+i+50*x,54+i+50*y,96-i+50*x,96-i+50*y,tags="tile animated",fill="#aaa",outline="#aaa")
 						screen.create_oval(54+i+50*x,52+i+50*y,96-i+50*x,94-i+50*y,tags="tile animated",fill="#fff",outline="#fff")
@@ -89,6 +91,7 @@ class Board:
 				elif self.array[x][y]!=self.oldarray[x][y] and self.array[x][y]=="b":
 					screen.delete("{0}-{1}".format(x,y))
 					#42 is width of tile so 21 is half of that
+					#Shrinking
 					for i in range(21):
 						screen.create_oval(54+i+50*x,54+i+50*y,96-i+50*x,96-i+50*y,tags="tile animated",fill="#aaa",outline="#aaa")
 						screen.create_oval(54+i+50*x,52+i+50*y,96-i+50*x,94-i+50*y,tags="tile animated",fill="#fff",outline="#fff")
@@ -96,6 +99,7 @@ class Board:
 							sleep(0.01)
 						screen.update()
 						screen.delete("animated")
+					#Growing
 					for i in reversed(range(21)):
 						screen.create_oval(54+i+50*x,54+i+50*y,96-i+50*x,96-i+50*y,tags="tile animated",fill="#000",outline="#000")
 						screen.create_oval(54+i+50*x,52+i+50*y,96-i+50*x,94-i+50*y,tags="tile animated",fill="#111",outline="#111")
@@ -546,10 +550,8 @@ def finalHeuristic(array,player):
 				if valid(array,player,x,y):
 					numMoves += 1
 		return numMoves+decentHeuristic(array,player)
-	elif moves<=16:
-		return -decentHeuristic(array,1-player)
 	elif moves<=52:
-		return decentHeuristic(array,player)
+		return (0.7*(decentHeuristic(array,player)))
 	elif moves<=58:
 		return slightlyLessDumbScore(array,player)
 	else:
