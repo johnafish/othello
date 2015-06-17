@@ -60,7 +60,7 @@ class Board:
 				elif self.oldarray[x][y]=="b":
 					screen.create_oval(54+50*x,54+50*y,96+50*x,96+50*y,tags="tile {0}-{1}".format(x,y),fill="#000",outline="#000")
 					screen.create_oval(54+50*x,52+50*y,96+50*x,94+50*y,tags="tile {0}-{1}".format(x,y),fill="#111",outline="#111")
-			
+		#Animation of new tiles
 		screen.update()
 		for x in range(8):
 			for y in range(8):
@@ -111,6 +111,8 @@ class Board:
 					screen.create_oval(54+50*x,54+50*y,96+50*x,96+50*y,tags="tile",fill="#000",outline="#000")
 					screen.create_oval(54+50*x,52+50*y,96+50*x,94+50*y,tags="tile",fill="#111",outline="#111")
 					screen.update()
+
+		#Drawing of highlight circles
 		for x in range(8):
 			for y in range(8):
 				if self.player == 0:
@@ -500,7 +502,6 @@ def decentHeuristic(array,player):
 			add = 1
 			
 			#Adjacent to corners are worth -3
-
 			if (x==0 and y==1) or (x==1 and 0<=y<=1):
 				if array[0][0]==colour:
 					add = sideVal
@@ -525,6 +526,8 @@ def decentHeuristic(array,player):
 					add = sideVal
 				else:
 					add = -adjacentVal
+
+
 			#Edge tiles worth 3
 			elif (x==0 and 1<y<6) or (x==7 and 1<y<6) or (y==0 and 1<x<6) or (y==7 and 1<x<6):
 				add=sideVal
@@ -538,10 +541,7 @@ def decentHeuristic(array,player):
 				score-=add
 	return score
 
-#The plan is this:
-#Early game (first 16 moves): Maximize moves
-#Midgame (17-32 move): Value Corners and edges (decentHeuristic)
-#Endgame: Make the move that is the most valuable for owning any pieces (dumbScore)
+#Seperating the use of heuristics for early/mid/late game.
 def finalHeuristic(array,player):
 	if moves<=8:
 		numMoves = 0
@@ -551,7 +551,7 @@ def finalHeuristic(array,player):
 					numMoves += 1
 		return numMoves+decentHeuristic(array,player)
 	elif moves<=52:
-		return (0.7*(decentHeuristic(array,player)))
+		return decentHeuristic(array,player)
 	elif moves<=58:
 		return slightlyLessDumbScore(array,player)
 	else:
@@ -636,16 +636,21 @@ def clickHandle(event):
 					if valid(board.array,board.player,x,y):
 						board.boardMove(x,y)
 	else:
+		#Difficulty clicking
 		if 300<=yMouse<=350:
+			#One star
 			if 25<=xMouse<=155:
-				difficulty = 0
+				depth = 1
 				playGame()
+			#Two star
 			elif 180<=xMouse<=310:
 				depth = 4
 				playGame()
+			#Three star
 			elif 335<=xMouse<=465:
 				depth = 6
 				playGame()
+
 def keyHandle(event):
 	symbol = event.keysym
 	if symbol.lower()=="r":
@@ -654,33 +659,39 @@ def keyHandle(event):
 		root.destroy()
 
 def create_buttons():
+		#Restart button
+		#Background/shadow
 		screen.create_rectangle(0,5,50,55,fill="#000033", outline="#000033")
 		screen.create_rectangle(0,0,50,50,fill="#000088", outline="#000088")
+
+		#Arrow
 		screen.create_arc(5,5,45,45,fill="#000088", width="2",style="arc",outline="white",extent=300)
 		screen.create_polygon(33,38,36,45,40,39,fill="white",outline="white")
 
+		#Quit button
+		#Background/shadow
 		screen.create_rectangle(450,5,500,55,fill="#330000", outline="#330000")
 		screen.create_rectangle(450,0,500,50,fill="#880000", outline="#880000")
-
+		#"X"
 		screen.create_line(455,5,495,45,fill="white",width="3")
 		screen.create_line(495,5,455,45,fill="white",width="3")
-
-def createStar(centerX,centerY):
-	pass
 	
 def runGame():
 	global running
 	running = False
+	#Title and shadow
 	screen.create_text(250,203,anchor="c",text="Othello",font=("Consolas", 50),fill="#aaa")
 	screen.create_text(250,200,anchor="c",text="Othello",font=("Consolas", 50),fill="#fff")
 	
+	#Creating the difficulty buttons
 	for i in range(3):
-
+		#Background
 		screen.create_rectangle(25+155*i, 310, 155+155*i, 355, fill="#000", outline="#000")
 		screen.create_rectangle(25+155*i, 300, 155+155*i, 350, fill="#111", outline="#111")
 
 		spacing = 130/(i+2)
 		for x in range(i+1):
+			#Star with double shadow
 			screen.create_text(25+(x+1)*spacing+155*i,326,anchor="c",text="\u2605", font=("Consolas", 25),fill="#b29600")
 			screen.create_text(25+(x+1)*spacing+155*i,327,anchor="c",text="\u2605", font=("Consolas",25),fill="#b29600")
 			screen.create_text(25+(x+1)*spacing+155*i,325,anchor="c",text="\u2605", font=("Consolas", 25),fill="#ffd700")
